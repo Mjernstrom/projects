@@ -1,4 +1,4 @@
-//  cryptogrrapher
+//  cryptographer
 //  Created by Matthew Jernstrom on 1/8/20.
 //  Copyright © 2020 Matthew Jernstrom. All rights reserved.
 //  More complicated encryptions to come! (I promise)
