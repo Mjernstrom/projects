@@ -52,8 +52,7 @@ void sorter(int array[], int size) {
             cout<<array[i]<<", ";
     }
 }
-int main(){
-    /**
+int main(){    
     int arraySize;
     cout<<"Enter size of array --> "<<endl;
     cin>>arraySize;
@@ -63,7 +62,6 @@ int main(){
         cin>>array[i];
     }
     sorter(array, arraySize);
-    **/
     int rows, columns;
     cout<<"Enter number of rows in the 2D array --> "<<endl;
     cin>>rows;
