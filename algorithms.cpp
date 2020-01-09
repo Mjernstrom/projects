@@ -16,7 +16,7 @@ void sorterTwoDimensional(int rows, int columns, int array[]) {
         for (y = 0; y < columns; y++)
             for (int z = 0; z < rows; z++){
                 for (int v = 0; v < columns; v++)
-                    if (array2D[x][y] > array2D[z][v]){
+                    if (array2D[x][y] < array2D[z][v]){
                         temp = array2D[x][y];
                         array2D[x][y] = array2D[z][v];
                         array2D[z][v] = temp;
