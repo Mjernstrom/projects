@@ -1,7 +1,8 @@
-//  main.cpp
-//  crypt
+//  cryptogrrapher
 //  Created by Matthew Jernstrom on 1/8/20.
 //  Copyright © 2020 Matthew Jernstrom. All rights reserved.
+//  More complicated encryptions to come! (I promise)
+//  This one might be turned into some kind of a game...perhaps a mystery game or a hacking game...
 #include <iostream>
 #include <new>
 using namespace std;
