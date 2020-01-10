@@ -1,6 +1,7 @@
 //  animation
 //  Created by Matthew Jernstrom on 1/9/20.
 //  Copyright © 2020 Matthew Jernstrom. All rights reserved.
+//  Creating some basic 2D animation 
 #include <iostream>
 using namespace std;
 string array1[10][10];
