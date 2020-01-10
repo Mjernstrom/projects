@@ -1,7 +1,12 @@
 //  BattleShip
 //  Created by Matthew Jernstrom on 1/8/20.
 //  Copyright © 2020 Matthew Jernstrom. All rights reserved.
-//
+//  Excited about this one; going to implement intelligent AI
+//  Planning on allowing bot to remember every other miss made to make it more difficult for the player
+//  My plan for the AI is to follow simple battleship logic. If the bot hits one of your ships spots, it turns on what I call "hit mode"
+//  The bot stores all memory of turns with missed spots adjacent to a hit spot
+//  So the bot will choose to hit another adjacent spot on it's next turn, and not choosing the previously missed spot
+//  Once the bot sinks your ship, "hit mode" is turned off. 
 #include <iostream>
 using namespace std;
 
