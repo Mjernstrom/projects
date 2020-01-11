@@ -9,54 +9,78 @@
 //  Once the bot sinks your ship, "hit mode" is turned off. 
 #include <iostream>
 using namespace std;
+string boardOpp[12][12];
+string boardPlayer[12][12];
 
+void shipPlacement(){
+    string placeInput;
+    if(placeInput[0] == 'A' || placeInput[0] == 'a'){
+        
+    }
+}
 
-int main() {
-    char boardOpp[12][12];
-    char boardPlayer[12][12];
+void displayCpuBoard(){
+    cout<<"\n"<<"CPU's board:"<<endl;
+    for(int i = 0; i < 12; i++)
+        for(int j = 0; j < 12; j++){
+            if (j == 0)
+                cout<<"\n\n"<<boardOpp[i][j]<<"   ";
+            else if (i == 0 && j == 10)
+                cout<<boardOpp[i][j]<<"  ";
+            else
+                cout<<boardOpp[i][j]<<"   ";
+        }
+}
+void displayPlBoard(){
+    cout<<"\n"<<"Player's board:"<<endl;
+    for(int i = 0; i < 12; i++)
+        for(int j = 0; j < 12; j++){
+            if (j == 0)
+                cout<<"\n\n"<<boardPlayer[i][j]<<"   ";
+            else if (i == 0 && j == 10)
+                cout<<boardPlayer[i][j]<<"  ";
+            else
+                cout<<boardPlayer[i][j]<<"   ";
+        }
+}
+void createBoard(){
+    char incrementChar = 65;
+    
     for(int i = 0; i < 12; i++)
         for(int j = 0; j < 12; j++){
             if (i == 0 && j == 0){
-                boardOpp[i][j] = ' ';
-                boardPlayer[i][j] = ' ';
+                boardOpp[i][j] = " ";
+                boardPlayer[i][j] = " ";
             }
-            boardOpp[i][j] = '?';
-            boardPlayer[i][j] = '.';
+            else if (i < 12 && j == 0){
+                boardOpp[i][j] = incrementChar;
+                boardPlayer[i][j] = incrementChar;
+                incrementChar++;
+            }
+            else if (i == 0 && j < 12){
+                
+                boardOpp[i][j] = to_string(j);
+                boardPlayer[i][j] = to_string(j);
+            }
+            else {
+                boardOpp[i][j] = "?";
+                boardPlayer[i][j] = ".";
+            }
         }
+}
+
+int main() {
+    // Display game instructions
     cout<<"\n"<<"    Welcome to the Battleship game!"<<endl
     <<"\n"<<"    Each time a ship is hit, a '!' will appear at the chosen spot. If the ship is destroyed, the ship's spots will appear as a '*'"<<endl;
     cout<<"\n"<<"    Your missed shots will not be remembered by the board, pay attention!"<<endl
     <<"\n"<<"    Each spot your ship takes up appears as a '+' "<<endl
     <<"\n"<<"    You have four game pieces (2 frigates and two attack boats): "<<endl<<"\n\n";
     cout<<"    1    2    3    4"<<"\n\n"<<"    +    +    +    +"<<endl<<"    +    +    +    +"<<endl<<"    +    +"<<"\n\n";
-    cout<<"\n"<<"Place your pieces by :"<<endl;
-    
-    /**
-    cout<<"\n"<<"CPU's board:"<<endl;
-    for(int i = 0; i < 10; i++)
-        for(int j = 0; j < 10; j++){
-            if (j == 0)
-                cout<<"\n\n"<<boardOpp[i][j]<<"   ";
-            else
-                cout<<boardOpp[i][j]<<"   ";
-        }
-    cout<<"\n\n";
-    **/
-    for(int i = 0; i < 12; i++)
-        for(int j = 0; j < 12; j++){
-            if (j == 0)
-                cout<<"\n\n"<<boardPlayer[i][j]<<"   ";
-            else
-                cout<<boardPlayer[i][j]<<"   ";
-        }
-    cout<<"\n"<<"Player's board:"<<endl;
-    for(int i = 0; i < 12; i++)
-        for(int j = 0; j < 12; j++){
-            if (j == 0)
-                cout<<"\n\n"<<boardPlayer[i][j]<<"   ";
-            else
-                cout<<boardPlayer[i][j]<<"   ";
-        }
+    cout<<"\n"<<"Place your pieces by entering the Letter followed by the number of the spot such as 'A5'. No diagnal placement! :"<<endl;
+    createBoard();
+    displayPlBoard();
+
     cout<<"\n\n";
     return 0;
 }
