@@ -1,11 +1,9 @@
 #include <iostream>
 #include <cmath>
 #include <string>
+// My first C++ practice project, it's awful
 using namespace std;
-/**
-TAKE IT EASY ON ME THIS IS A COMPLETE NOOB ATTEMPT 
-Still need to implement proper handles for Player win conditions...
-**/
+
 void displayBoard_X(int X_input,char &spot_1,char &spot_2,char &spot_3,char &spot_4,char &spot_5,char &spot_6,char &spot_7,char &spot_8,char &spot_9,char &spot_10, char &spot_11,char &spot_12,char &spot_13,char &spot_14,char &spot_15)
 {
   if(X_input == 1)
