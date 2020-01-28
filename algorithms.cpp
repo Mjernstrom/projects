@@ -1,7 +1,6 @@
 //  Created by Matthew Jernstrom on 1/5/20.
 //  Copyright © 2020 Matthew Jernstrom. All rights reserved.
-//  Pretty much just hashing out some algorithms on here and using output to describe the process... 
-//  Might refer to this file to paste in some more complex logic into other projects...
+// Algo practice
 #include <iostream>
 using namespace std;
 
