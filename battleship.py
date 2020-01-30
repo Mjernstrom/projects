@@ -1,6 +1,7 @@
 # This is a stupidly inefficient but nevertheless funtional attempt at Battleship with fully functioning AI, no special libraries.
 from random import randint
 import copy
+import enum
 # List declarations
 boardP = [["   ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
           ["A: ", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
@@ -15,31 +16,52 @@ boardP = [["   ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
           ["J: ", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
           ["K: ", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."]]
 
-boardBot = copy.deepcopy(boardP)
-boardBotDisplay = copy.deepcopy(boardP)
-arrayBattleship = [[None for y in range(2)] for x in range(5)]
-arrayCruiser = [[None for i in range(2)] for j in range(4)]
-arrayFrigate = [[None for a in range(2)] for b in range(3)]
-arrayGunboat = [[None for c in range(2)] for d in range(2)]
 
-# Set the bot display board to have '?' spots
+boardBot = [[" ", " ", " ", " ", " ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            ["#", "#", "#", "#", "#", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "#", "#", "#", "#"],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
+            [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "]]
+
+
+# Create and set the bot display board to have '?' spots
+
+boardBotDisplay = copy.deepcopy(boardP)
 for i in range(1, 12):
     for j in range(1, 12):
         boardBotDisplay[i][j] = "?"
 
+
 # Prints Player board
+
 def printPBoard():
-    for i in range(0, 12):
-        for j in range(0, 12):
-            if j == 0:
+    for x in range(0, 12):
+        for y in range(0, 12):
+            if y == 0:
                 print("\n")
-            if i == 0 and j == 10:
-                print(boardP[i][j], end="   ")
+            if x == 0 and y == 10:
+                print(boardP[x][y], end="   ")
             else:
-                print(boardP[i][j], end="    ")
+                print(boardP[x][y], end="    ")
 
 
 # Prints Bot board
+
 def printBotBoard():
     for i in range(0, 12):
         for j in range(0, 12):
@@ -50,31 +72,41 @@ def printBotBoard():
             else:
                 print(boardBotDisplay[i][j], end="    ")
 
+
 # Prints Bot hidden board for testing purposes
+# Print is messed up for the moment
+
 def printBotHidden():
-    for i in range(0, 12):
-        for j in range(0, 12):
-            if j == 0:
-                print("\n")
-            if i == 0 and j == 10:
-                print(boardBot[i][j], end="   ")
-            else:
-                print(boardBot[i][j], end="    ")
+    x = 5
+    while x < 16:
+        print("\n")
+        y = 5
+        while y < 16:
+            print(boardBot[x][y], end="     ")
+            y += 1
+        x += 1
+
 
 # Intro to game and instructions
+
 def gameIntro():
     print("\n\n        Welcome to my Battleship game!\n        Each ship space is marked with it's corresponding starting letter")
     print("\n\n        If you hit the opponents space, the '?' will turn into a '!'")
     print("\n        If you destroy an opponents ship, the '!' marks each turn into a '*'")
     print("\n        Below your 4 ships are listed: a Battleship, a Cruiser, a Frigate, and a GunBoat -->")
     print("\n\n     B  C  F  G\n     B  C  F  G\n     B  C  F\n     B  C\n     B")
-    print("\n\n     Enter each space for your ships by typing in the corresponding spot such as 'A5':")
+    print("\n\n     Enter each space for your ships by typing in the corresponding spot such as 'A5'")
+    print("\n\n     DO NOT DIAGONALLY PLACE SHIP PIECES! If you do so, restart program!:")
 
 
 # Initialize placement of Player ships
+
 def placementInit(inputstring, shippiece):
-    stringIn = inputstring[0]
+    stringIn = inputstring
     length = len(inputstring)
+
+    # If player inputs column 10 or 11, we want access to 3 string elements:
+
     if length == 3:
         numberIn = int(inputstring[2])
         if numberIn == 0:
@@ -89,6 +121,9 @@ def placementInit(inputstring, shippiece):
                 return True
             else:
                 return False
+
+    # If spot is in column 1-9:
+
     elif length == 2:
         numberIn = int(inputstring[1])
         check = placement(stringIn, numberIn, shippiece)
@@ -100,166 +135,117 @@ def placementInit(inputstring, shippiece):
         print('Invalid input length provided!')
         return False
 
+
 # Handle placement of Player ships
+
 def placement(stringinput, numberinput, shippiece):
     numberIn = numberinput
-    if stringinput == "A" or stringinput == "a":
-        if boardP[1][numberIn] == ".":
-            boardP[1][numberIn] = shippiece
+
+    # Convert string to character, and then use corresponding ord() value to compare
+    charToInt = ord(stringinput[0])
+
+    # For capital letters:
+
+    if charToInt < 97:
+        if boardP[charToInt - 64][numberIn] == ".":
+            boardP[charToInt - 64][numberIn] = shippiece
         else:
             return False
-    elif stringinput == "B" or stringinput == "b":
-        if boardP[2][numberIn] == ".":
-            boardP[2][numberIn] = shippiece
+
+    # For lowercase letters:
+
+    else:
+        if boardP[charToInt - 96][numberIn] == ".":
+            boardP[charToInt - 96][numberIn] = shippiece
         else:
             return False
-    elif stringinput == "C" or stringinput == "c":
-        if boardP[3][numberIn] == ".":
-            boardP[3][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "D" or stringinput == "d":
-        if boardP[4][numberIn] == ".":
-            boardP[4][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "E" or stringinput == "e":
-        if boardP[5][numberIn] == ".":
-            boardP[5][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "F" or stringinput == "f":
-        if boardP[6][numberIn] == ".":
-            boardP[6][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "G" or stringinput == "g":
-        if boardP[7][numberIn] == ".":
-            boardP[7][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "H" or stringinput == "h":
-        if boardP[8][numberIn] == ".":
-            boardP[8][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "I" or stringinput == "i":
-        if boardP[9][numberIn] == ".":
-            boardP[9][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "J" or stringinput == "j":
-        if boardP[10][numberIn] == ".":
-            boardP[10][numberIn] = shippiece
-        else:
-            return False
-    elif stringinput == "K" or stringinput == "k":
-        if boardP[11][numberIn] == ".":
-            boardP[11][numberIn] = shippiece
-        else:
-            return False
+
     return True
 
 # Handles placement of AI ship spots
-# Extends list to allow bot to check out of bounds
+
 def botPlacement():
-    # Extend first 12 rows 5 spaces to the left
-    for i in range(0, 12):
-        for j in range(-6, 0):
-            boardBot[j][i] = ""
-    # Extend last 12 rows 5 spaces to the right
-    for i in range(0, 12):
-        for j in range(12, 18):
-            boardBot[i][j] = ""
-    # Extend top of list up 5 spaces
-    for i in range(0, 12):
-        for j in range(-6, 0):
-            boardBot[i][j] = ""
-    # Extend bottom of list down 5 spaces
-    for i in range(0, 12):
-        for j in range(12, 18):
-            boardBot[j][i] = ""
+    x = 1
+    # Extend bot board
 
     # Generate random initial spot for ship placement
-    x = 1
-    while x < 5:
-        randRowInit = randint(1, 12)
-        randColInit = randint(1, 12)
-        
-        # Place Battleship spots
-        
-        if x == 1:
-            initCheck = True
-            if boardBot[randRowInit][randColInit] == ".":
-                boardBot[randRowInit][randColInit] = "B"
-            else:
-                initCheck = False
-                
-            # Give bot a random direction (up, down, left, right) to continue spot placement
-            
-            if initCheck:
-                continueCheck = True
-                while continueCheck:
-                    randDirection = randint(1, 5)
-                    
-                    # Check and place next 4 spots down
-                    
-                    finalLoop = 1
-                    finalCheck = True
-                    if randDirection == 1:
-                        while finalLoop < 5:
-                           if boardBot[randColInit + finalLoop][randColInit] != ".":
-                               finalCheck = False
-                               finalLoop = 5
-                           else:
-                               finalLoop += 1
-                        if finalCheck:
-                            for i in range(1, 5):
-                                boardBot[randColInit + i][randColInit] = "B"
-                                continueCheck = False
-                               
-                    # Check and place next 4 spots up
-                    
-                    elif randDirection == 2:
-                        while finalLoop < 5:
-                            if boardBot[randColInit - finalLoop][randColInit] != ".":
-                                finalCheck = False
-                                finalLoop = 5
-                            else:
-                                finalLoop += 1
-                        if finalCheck:
-                            for i in range(1, 5):
-                                boardBot[randColInit - i][randColInit] = "B"
-                                continueCheck = False
-                                
-                    # Check and place next 4 spots left
-                    
-                    elif randDirection == 3:
-                        while finalLoop < 5:
-                            if boardBot[randColInit][randColInit - finalLoop] != ".":
-                                finalCheck = False
-                                finalLoop = 5
-                            else:
-                                finalLoop += 1
-                        if finalCheck:
-                            for i in range(1, 5):
-                                boardBot[randColInit][randColInit - i] = "B"
-                                continueCheck = False
 
-                    # Check and place next 4 spots right
-                    
-                    elif randDirection == 4:
-                        while finalLoop < 5:
-                            if boardBot[randColInit][randColInit + finalLoop] != ".":
-                                finalCheck = False
-                                finalLoop = 5
-                            else:
-                                finalLoop += 1
-                        if finalCheck:
-                            for i in range(1, 5):
-                                boardBot[randColInit][randColInit + i] = "B"
-                                continueCheck = False
-                    x += 1
+    while x < 5:
+        randRowInit = randint(5, 16)
+        randColInit = randint(5, 16)
+
+        # Place Battleship spots
+
+        if x == 1:
+            boardBot[randRowInit][randColInit] = "B"
+
+            # Give bot a random direction (up, down, left, right) to continue spot placement
+
+            continueCheck = True
+            while continueCheck:
+                randDirection = randint(1, 5)
+                finalLoop = 1
+                finalCheck = True
+
+                # Check and place next 4 spots down
+
+                if randDirection == 1:
+                    while finalLoop < 5:
+                        if boardBot[randRowInit + finalLoop][randColInit] != ".":
+                            finalCheck = False
+                            finalLoop = 5
+                        else:
+                             finalLoop += 1
+                    if finalCheck:
+                          for i in range(1, 5):
+                              boardBot[randRowInit + i][randColInit] = "B"
+                          continueCheck = False
+                          x += 1
+
+                # Check and place next 4 spots up
+
+                elif randDirection == 2:
+                     while finalLoop < 5:
+                        if boardBot[randRowInit - finalLoop][randColInit] != ".":
+                            finalCheck = False
+                            finalLoop = 5
+                        else:
+                            finalLoop += 1
+                     if finalCheck:
+                        for i in range(1, 5):
+                            boardBot[randRowInit - i][randColInit] = "B"
+                        continueCheck = False
+                        x += 1
+
+                # Check and place next 4 spots left
+
+                elif randDirection == 3:
+                      while finalLoop < 5:
+                        if boardBot[randRowInit][randColInit - finalLoop] != ".":
+                            finalCheck = False
+                            finalLoop = 5
+                        else:
+                            finalLoop += 1
+                      if finalCheck:
+                        for i in range(1, 5):
+                            boardBot[randRowInit][randColInit - i] = "B"
+                        continueCheck = False
+                        x += 1
+
+                # Check and place next 4 spots right
+
+                elif randDirection == 4:
+                    while finalLoop < 5:
+                        if boardBot[randRowInit][randColInit + finalLoop] != ".":
+                            finalCheck = False
+                            finalLoop = 5
+                        else:
+                            finalLoop += 1
+                    if finalCheck:
+                        for i in range(1, 5):
+                            boardBot[randRowInit][randColInit + i] = "B"
+                        continueCheck = False
+                        x += 1
 
         # Place Cruiser spots
 
@@ -283,61 +269,64 @@ def botPlacement():
                     finalCheck = True
                     if randDirection == 1:
                         while finalLoop < 4:
-                            if boardBot[randColInit + finalLoop][randColInit] != ".":
+                            if boardBot[randRowInit + finalLoop][randColInit] != ".":
                                 finalCheck = False
                                 finalLoop = 4
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 4):
-                                boardBot[randColInit + i][randColInit] = "C"
+                                boardBot[randRowInit + i][randColInit] = "C"
                                 continueCheck = False
+                                x = 3
 
                     # Check and place next 3 spots up
 
                     elif randDirection == 2:
                         while finalLoop < 4:
-                            if boardBot[randColInit - finalLoop][randColInit] != ".":
+                            if boardBot[randRowInit - finalLoop][randColInit] != ".":
                                 finalCheck = False
                                 finalLoop = 4
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 4):
-                                boardBot[randColInit - i][randColInit] = "C"
+                                boardBot[randRowInit - i][randColInit] = "C"
                                 continueCheck = False
+                                x = 3
 
                     # Check and place next 3 spots left
 
                     elif randDirection == 3:
                         while finalLoop < 4:
-                            if boardBot[randColInit][randColInit - finalLoop] != ".":
+                            if boardBot[randRowInit][randColInit - finalLoop] != ".":
                                 finalCheck = False
                                 finalLoop = 4
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 4):
-                                boardBot[randColInit][randColInit - i] = "C"
+                                boardBot[randRowInit][randColInit - i] = "C"
                                 continueCheck = False
+                                x = 3
 
                     # Check and place next 3 spots right
 
                     elif randDirection == 4:
                         while finalLoop < 4:
-                            if boardBot[randColInit][randColInit + finalLoop] != ".":
+                            if boardBot[randRowInit][randColInit + finalLoop] != ".":
                                 finalCheck = False
                                 finalLoop = 4
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 4):
-                                boardBot[randColInit][randColInit + i] = "C"
+                                boardBot[randRowInit][randColInit + i] = "C"
                                 continueCheck = False
-                    x += 1
-                    
+                                x = 3
+
         # Place Frigate spots
-                    
+
         elif x == 3:
             initCheck = True
             if boardBot[randRowInit][randColInit] == ".":
@@ -358,62 +347,67 @@ def botPlacement():
                     finalCheck = True
                     if randDirection == 1:
                         while finalLoop < 3:
-                            if boardBot[randColInit + finalLoop][randColInit] != ".":
+                            if boardBot[randRowInit + finalLoop][randColInit] != ".":
                                 finalCheck = False
                                 finalLoop = 3
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 3):
-                                boardBot[randColInit + i][randColInit] = "F"
+                                boardBot[randRowInit + i][randColInit] = "F"
                                 continueCheck = False
+                                x = 4
 
                     # Check and place next 2 spots up
 
                     elif randDirection == 2:
                         while finalLoop < 3:
-                            if boardBot[randColInit - finalLoop][randColInit] != ".":
+                            if boardBot[randRowInit - finalLoop][randColInit] != ".":
                                 finalCheck = False
                                 finalLoop = 3
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 3):
-                                boardBot[randColInit - i][randColInit] = "F"
+                                boardBot[randRowInit - i][randColInit] = "F"
                                 continueCheck = False
+                                x = 4
 
                     # Check and place next 2 spots left
 
                     elif randDirection == 3:
                         while finalLoop < 3:
-                            if boardBot[randColInit][randColInit - finalLoop] != ".":
+                            if boardBot[randRowInit][randColInit - finalLoop] != ".":
                                 finalCheck = False
                                 finalLoop = 3
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 3):
-                                boardBot[randColInit][randColInit - i] = "F"
+                                boardBot[randRowInit][randColInit - i] = "F"
                                 continueCheck = False
+                                x = 4
 
                     # Check and place next 2 spots right
 
                     elif randDirection == 4:
                         while finalLoop < 3:
-                            if boardBot[randColInit][randColInit + finalLoop] != ".":
+                            if boardBot[randRowInit][randColInit + finalLoop] != ".":
                                 finalCheck = False
                                 finalLoop = 3
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 3):
-                                boardBot[randColInit][randColInit + i] = "F"
+                                boardBot[randRowInit][randColInit + i] = "F"
                                 continueCheck = False
-                    x += 1
+                                x = 4
 
         # Place Gunboat spots
 
         elif x == 4:
+            randRowInit = randint(5, 16)
+            randColInit = randint(5, 16)
             initCheck = True
             if boardBot[randRowInit][randColInit] == ".":
                 boardBot[randRowInit][randColInit] = "G"
@@ -433,66 +427,66 @@ def botPlacement():
                     finalCheck = True
                     if randDirection == 1:
                         while finalLoop < 2:
-                            if boardBot[randColInit + finalLoop][randColInit] != ".":
+                            if boardBot[randRowInit + finalLoop][randColInit] != ".":
                                 finalCheck = False
                                 finalLoop = 2
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 2):
-                                boardBot[randColInit + i][randColInit] = "G"
+                                boardBot[randRowInit + i][randColInit] = "G"
                                 continueCheck = False
+                                x += 1
 
                     # Check and place next spot up
 
                     elif randDirection == 2:
                         while finalLoop < 2:
-                            if boardBot[randColInit - finalLoop][randColInit] != ".":
+                            if boardBot[randRowInit - finalLoop][randColInit] != ".":
                                 finalCheck = False
                                 finalLoop = 2
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 2):
-                                boardBot[randColInit - i][randColInit] = "G"
+                                boardBot[randRowInit - i][randColInit] = "G"
                                 continueCheck = False
+                                x += 1
 
                     # Check and place next spot left
 
                     elif randDirection == 3:
                         while finalLoop < 2:
-                            if boardBot[randColInit][randColInit - finalLoop] != ".":
+                            if boardBot[randRowInit][randColInit - finalLoop] != ".":
                                 finalCheck = False
                                 finalLoop = 2
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 2):
-                                boardBot[randColInit][randColInit - i] = "G"
+                                boardBot[randRowInit][randColInit - i] = "G"
                                 continueCheck = False
+                                x += 1
 
                     # Check and place next spot right
 
                     elif randDirection == 4:
                         while finalLoop < 2:
-                            if boardBot[randColInit][randColInit + finalLoop] != ".":
+                            if boardBot[randRowInit][randColInit + finalLoop] != ".":
                                 finalCheck = False
                                 finalLoop = 2
                             else:
                                 finalLoop += 1
                         if finalCheck:
                             for i in range(1, 2):
-                                boardBot[randColInit][randColInit + i] = "G"
+                                boardBot[randRowInit][randColInit + i] = "G"
                                 continueCheck = False
-                    x += 1
-            
-
-# Checks if ship is destroyed
-def checkShips():
+                                x += 1
 
 
 
 # Handles input for player ship spots
+
 def createBoard():
     j = 1
     battleshipPiece = "B"
@@ -539,11 +533,39 @@ def createBoard():
         else:
             print(inputstring, " is not a valid spot! Choose again -->")
 
+# Handle bot turn
+
+# def botTurn():
+
+
+# Handle Player turn
+
+def playerTurn(spot):
+     if spot:
+
+
+# def checkTurn():
+
+
+
+
 # Master function
 
 def main():
-    gameIntro()
-    createBoard()
+    # gameIntro()
+    # createBoard()
+    # printPBoard()
+    botPlacement()
+    printBotHidden()
+
+   # Game loop
+    gameLoop = True
+    while gameLoop:
+        # checkTurn()
+        playerSpot = input("\nEnter spot to attack:")
+        playerTurn(playerSpot)
+        # checkTurn()
+        # botTurn()
     printPBoard()
 
 
