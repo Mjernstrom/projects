@@ -1,4 +1,4 @@
-// A very inefficient yet functional Battleship game, all thats left is smart bot spot placement
+# A very inefficient yet functional Battleship game, all thats left is smart bot spot placement
 from random import randint
 import copy
 
