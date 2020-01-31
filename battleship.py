@@ -1,7 +1,7 @@
-# This is a stupidly inefficient but nevertheless funtional attempt at Battleship with fully functioning AI, no special libraries.
+# Welcome to my messy Battleship game!
 from random import randint
 import copy
-import enum
+
 # List declarations
 boardP = [["   ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
           ["A: ", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."],
@@ -38,6 +38,19 @@ boardBot = [[" ", " ", " ", " ", " ", "1", "2", "3", "4", "5", "6", "7", "8", "9
             [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "],
             [" ", " ", " ", " ", " ", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", "#", " ", " ", " ", " "]]
 
+# Create a few counters to keep track of how many spots of each ship were hit,
+# as well as a counter tracking how many ships were sunk
+
+bShipBot = 0
+frigBot = 0
+cruBot = 0
+gbBot = 0
+bShipPl = 0
+frigPl = 0
+cruPl = 0
+gbPl = 0
+botSunk = 0
+plSunk = 0
 
 # Create and set the bot display board to have '?' spots
 
@@ -74,7 +87,6 @@ def printBotBoard():
 
 
 # Prints Bot hidden board for testing purposes
-# Print is messed up for the moment
 
 def printBotHidden():
     x = 5
@@ -90,14 +102,14 @@ def printBotHidden():
 # Intro to game and instructions
 
 def gameIntro():
-    print("\n\n        Welcome to my Battleship game!\n        Each ship space is marked with it's corresponding starting letter")
-    print("\n\n        If you hit the opponents space, the '?' will turn into a '!'")
-    print("\n        If you destroy an opponents ship, the '!' marks each turn into a '*'")
-    print("\n        Below your 4 ships are listed: a Battleship, a Cruiser, a Frigate, and a GunBoat -->")
-    print("\n\n     B  C  F  G\n     B  C  F  G\n     B  C  F\n     B  C\n     B")
-    print("\n\n     Enter each space for your ships by typing in the corresponding spot such as 'A5'")
-    print("\n\n     DO NOT DIAGONALLY PLACE SHIP PIECES! If you do so, restart program!:")
-
+    print("\n\n        Welcome to my Battleship game!\n        Each ship space is marked with it's corresponding",
+          "beginning letter\n\n        If you hit the opponents space, the '?' will turn into a '!'",
+          "\n\n        If you hit the opponents space, the '?' will turn into a '!'",
+          "\n        If you destroy an opponents ship, the '!' marks each turn into a '*'",
+          "\n        Below your 4 ships are listed: a Battleship, a Cruiser, a Frigate, and a GunBoat -->",
+          "\n\n     B  C  F  G\n     B  C  F  G\n     B  C  F\n     B  C\n     B",
+          "\n\n     Enter each space for your ships by typing in the corresponding spot such as 'A5'",
+          "\n\n     DO NOT DIAGONALLY PLACE SHIP PIECES! If you do so, restart program!:")
 
 # Initialize placement of Player ships
 
@@ -195,17 +207,17 @@ def botPlacement():
                             finalCheck = False
                             finalLoop = 5
                         else:
-                             finalLoop += 1
+                            finalLoop += 1
                     if finalCheck:
-                          for i in range(1, 5):
-                              boardBot[randRowInit + i][randColInit] = "B"
-                          continueCheck = False
-                          x += 1
+                        for i in range(1, 5):
+                            boardBot[randRowInit + i][randColInit] = "B"
+                        continueCheck = False
+                        x += 1
 
                 # Check and place next 4 spots up
 
                 elif randDirection == 2:
-                     while finalLoop < 5:
+                    while finalLoop < 5:
                         if boardBot[randRowInit - finalLoop][randColInit] != ".":
                             finalCheck = False
                             finalLoop = 5
@@ -484,7 +496,6 @@ def botPlacement():
                                 x += 1
 
 
-
 # Handles input for player ship spots
 
 def createBoard():
@@ -533,41 +544,163 @@ def createBoard():
         else:
             print(inputstring, " is not a valid spot! Choose again -->")
 
-# Handle bot turn
+# Handle's turns
+# Returns 0 if invalid spot, True if hit, False if miss, 1 if player has sunk a bot's ship,
+# 2 if bot has sunk a players ship, "Win" if player wins, and "Loss" if bot wins
 
-# def botTurn():
+def turn(spot, user):
 
+    # Allow function to modify game counters
 
-# Handle Player turn
+    global bShipBot
+    global frigBot
+    global cruBot
+    global gbBot
+    global bShipPl
+    global frigPl
+    global cruPl
+    global gbPl
+    global botSunk
+    global plSunk
+    length = len(inputstring)
+    numberIn = int(spot[1])
 
-def playerTurn(spot):
-     if spot:
+    # Convert the first part of the string to it's corresponding row number
 
+    row = ord(spot[0])
+    if row <= 75:
+        row -= 64
+    else:
+        row -= 96
 
-# def checkTurn():
+    # Check col number and make comparison
 
+    if length == 3:
+        numberIn = int(inputstring[2])
 
+        # Checks if hit or miss for the 10th column on player or bot's turn, increments hit counter if hit
+
+        if numberIn == 0:
+            if user == 1:
+                if boardBot[row + 4][14] != ".":
+                    if boardBot[row + 4][14] == "B":
+                        bShipBot += 1
+                    elif boardBot[row + 4][14] == "C":
+                        cruBot += 1
+                    elif boardBot[row + 4][14] == "F":
+                        frigBot += 1
+                    elif boardBot[row + 4][14] == "G":
+                        gbBot += 1
+                    boardBotDisplay[row][10] = "!"
+                    return "HIT!"
+                else:
+                    return "MISS!"
+            elif user == 2:
+                if boardP[row][10] != ".":
+                    if boardP[row][10] == "B":
+                        bShipPl += 1
+                    elif boardP[row][10] == "C":
+                        cruPl += 1
+                    elif boardP[row][10] == "F":
+                        frigPl += 1
+                    elif boardP[row][10] == "G":
+                        gbPl += 1
+                    boardP[row][10] = "!"
+                    return "You have been hit!"
+                else:
+                    return "Bot MISSED!"
+
+        # Checks if hit or miss for the 11th column on player or bot's turn, increments hit counter if hit
+                
+        elif numberIn == 1:
+            if user == 1:
+                if boardBot[row + 4][15] != ".":
+                    if boardBot[row + 4][15] == "B":
+                        bShipBot += 1
+                    elif boardBot[row + 4][15] == "C":
+                        cruBot += 1
+                    elif boardBot[row + 4][15] == "F":
+                        frigBot += 1
+                    elif boardBot[row + 4][15] == "G":
+                        gbBot += 1
+                    boardBotDisplay[row][11] = "!"
+                    return "HIT!"
+                else:
+                    return "MISS!"
+            elif user == 2:
+                if boardP[row][11] != ".":
+                    if boardP[row][11] == "B":
+                        bShipPl += 1
+                    elif boardP[row][11] == "C":
+                        cruPl += 1
+                    elif boardP[row][11] == "F":
+                        frigPl += 1
+                    elif boardP[row][11] == "G":
+                        gbPl += 1
+                    boardP[row][11] = "!"
+                    return "You have been hit!"
+                else:
+                    return "Bot MISSED!"
+
+    # Checks if hit or miss for any column less than 10 on player or bot's turn, increments hit counter if hit
+                
+    elif length == 2:
+        if user == 1:
+            if boardBot[row + 4][numberIn + 4] != ".":
+                if boardBot[row + 4][numberIn + 4] == "B":
+                    bShipBot += 1
+                elif boardBot[row + 4][numberIn + 4] == "C":
+                    cruBot += 1
+                elif boardBot[row + 4][numberIn + 4] == "F":
+                    frigBot += 1
+                elif boardBot[row + 4][numberIn + 4] == "G":
+                    gbBot += 1
+                boardBotDisplay[row][numberIn] = "!"
+                return "HIT!"
+            else:
+                return "MISS!"
+        elif user == 2:
+            if boardP[row][11] != ".":
+                if boardP[row][11] == "B":
+                    bShipPl += 1
+                elif boardP[row][11] == "C":
+                    cruPl += 1
+                elif boardP[row][11] == "F":
+                    frigPl += 1
+                elif boardP[row][11] == "G":
+                    gbPl += 1
+                boardP[row][11] = "!"
+                return "You have been hit!"
+            else:
+                return "Bot MISSED!"
+            
+   # Check          
+            
+            
+            
+    return "Invalid spot, choose again"
+    
 
 
 # Master function
 
 def main():
-    # gameIntro()
+    gameIntro()
     # createBoard()
     # printPBoard()
-    botPlacement()
-    printBotHidden()
-
+    # botPlacement()
+    # printBotHidden()
+    
    # Game loop
     gameLoop = True
     while gameLoop:
         # checkTurn()
         playerSpot = input("\nEnter spot to attack:")
-        playerTurn(playerSpot)
+        turn(playerSpot, 1)
         # checkTurn()
+        turn(botSpot, 2)
         # botTurn()
-    printPBoard()
+    # printPBoard()
 
 
 main()
-
