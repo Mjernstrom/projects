@@ -1,7 +1,6 @@
-//  cryptographer
 //  Created by Matthew Jernstrom on 1/8/20.
 //  Copyright © 2020 Matthew Jernstrom. All rights reserved.
-//  Hacker game 
+//  Not really sure what I was doing with this
 #include <iostream>
 #include <new>
 using namespace std;
