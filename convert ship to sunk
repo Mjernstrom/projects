@@ -1,0 +1,504 @@
+# Scans board bot's display board for #'s and compares location to hidden board's letter in the scanned positions
+# If it detects a certain amount of #'s, it will convert each display board spot from # to *
+# Only shows bot's sunk ships
+
+def convertToSunk(ship, user):
+    global boardPcopy
+
+    # Scan bot's board for a sunk ship:
+
+    if ship == 4:
+        scanCount = 1
+
+        # Scan for # horizontally:
+
+        for i in range(1, 12):
+            if scanCount == 5:
+                break
+            else:
+                for j in range(1, 8):
+                    if scanCount == 5:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 5):
+                                if boardP[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 5):
+                                if boardBotDisplay[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+
+        # If the code makes it here, set board pieces for the ship to '*'
+        # Has to check hidden board to ensure all the '!'s are of the same ship type
+
+        if scanCount == 5:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 5:
+                    break
+                else:
+                    for j in range(1, 8):
+                        if scanCount == 5:
+                            break
+                        else:
+                            for convert in range(0, 5):
+                                if user == 2:
+                                    if boardPCopy[i][j + convert] == "B":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[i + 4][j + 4 + convert] == "B":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 5:
+                                if user == 2:
+                                    for convert in range(0, 5):
+                                        boardP[i][j + convert] = "*"
+                                    print("\nYour Battleship has been sunk!")
+                                else:
+                                    for convert in range(0, 5):
+                                        boardBotDisplay[i][j + convert] = "*"
+                                    print("\nEnemy Battleship sunk!")
+                                return True
+
+        # Scan for # vertically:
+
+        scanCount = 1
+        for i in range(1, 12):
+            if scanCount == 5:
+                break
+            else:
+                for j in range(1, 8):
+                    if scanCount == 5:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 5):
+                                if boardP[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 5):
+                                if boardBotDisplay[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+        if scanCount == 5:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 5:
+                    break
+                else:
+                    for j in range(1, 8):
+                        if scanCount == 5:
+                            break
+                        else:
+                            for convert in range(0, 5):
+                                if user == 2:
+                                    if boardPCopy[j + convert][i] == "B":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[j + 4 + convert][i + 4] == "B":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 5:
+                                if user == 2:
+                                    for convert in range(0, 5):
+                                        boardP[j + convert][i] = "*"
+                                    print("\nYour Battleship has been sunk!")
+                                else:
+                                    for convert in range(0, 5):
+                                        boardBotDisplay[j + convert][i] = "*"
+                                    print("\nEnemy Battleship sunk!")
+                                return True
+
+    elif ship == 3:
+        scanCount = 1
+
+        # Scan for # horizontally:
+
+        for i in range(1, 12):
+            if scanCount == 4:
+                break
+            else:
+                for j in range(1, 9):
+                    if scanCount == 4:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 4):
+                                if boardP[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 4):
+                                if boardBotDisplay[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+
+        # If the code makes it here, set board pieces for the ship to '*'
+        # Has to check hidden board to ensure all the '!'s are of the same ship type
+
+        if scanCount == 4:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 4:
+                    break
+                else:
+                    for j in range(1, 9):
+                        if scanCount == 4:
+                            break
+                        else:
+                            for convert in range(0, 4):
+                                if user == 2:
+                                    if boardPCopy[i][j + convert] == "C":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[i + 4][j + 4 + convert] == "C":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 4:
+                                if user == 2:
+                                    for convert in range(0, 4):
+                                        boardP[i][j + convert] = "*"
+                                    print("\nYour Cruiser has been sunk!")
+                                else:
+                                    for convert in range(0, 4):
+                                        boardBotDisplay[i][j + convert] = "*"
+                                    print("\nEnemy Cruiser sunk!")
+                                return True
+
+        # Scan for # vertically:
+
+        scanCount = 1
+        for i in range(1, 12):
+            if scanCount == 4:
+                break
+            else:
+                for j in range(1, 9):
+                    if scanCount == 4:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 4):
+                                if boardP[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 4):
+                                if boardBotDisplay[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+        if scanCount == 4:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 4:
+                    break
+                else:
+                    for j in range(1, 9):
+                        if scanCount == 4:
+                            break
+                        else:
+                            for convert in range(0, 4):
+                                if user == 2:
+                                    if boardPCopy[j + convert][i] == "C":
+                                         scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[j + 4 + convert][i + 4] == "C":
+                                         scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 4:
+                                 if user == 2:
+                                    for convert in range(0, 4):
+                                        boardP[j + convert][i] = "*"
+                                    print("\nYour Cruiser has been sunk!")
+                                 else:
+                                    for convert in range(0, 4):
+                                        boardBotDisplay[j + convert][i] = "*"
+                                    print("\nEnemy Cruiser sunk!")
+                                 return True
+
+    elif ship == 2:
+        scanCount = 1
+
+        # Scan for # horizontally:
+
+        for i in range(1, 12):
+            if scanCount == 3:
+                break
+            else:
+                for j in range(1, 10):
+                    if scanCount == 3:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 3):
+                                if boardP[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 3):
+                                if boardBotDisplay[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+
+        # If the code makes it here, set board pieces for the ship to '*'
+        # Has to check hidden board to ensure all the '!'s are of the same ship type
+
+        if scanCount == 3:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 3:
+                    break
+                else:
+                    for j in range(1, 10):
+                        if scanCount == 3:
+                            break
+                        else:
+                            for convert in range(0, 3):
+                                if user == 2:
+                                    if boardPCopy[i][j + convert] == "F":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[i + 4][j + 4 + convert] == "F":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 3:
+                                if user == 2:
+                                    for convert in range(0, 3):
+                                        boardP[i][j + convert] = "*"
+                                    print("\nYour Frigate has been sunk!")
+                                else:
+                                    for convert in range(0, 3):
+                                        boardBotDisplay[i][j + convert] = "*"
+                                    print("\nEnemy Frigate sunk!")
+                                return True
+
+        # Scan for # vertically:
+
+        scanCount = 1
+        for i in range(1, 12):
+            if scanCount == 3:
+                break
+            else:
+                for j in range(1, 10):
+                    if scanCount == 3:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 3):
+                                if boardP[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 3):
+                                if boardBotDisplay[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+        if scanCount == 3:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 3:
+                    break
+                else:
+                    for j in range(1, 10):
+                        if scanCount == 3:
+                             break
+                        else:
+                            for convert in range(0, 3):
+                                if user == 2:
+                                    if boardPCopy[j + convert][i] == "F":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[j + 4 + convert][i + 4] == "F":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 3:
+                                if user == 2:
+                                    for convert in range(0, 3):
+                                        boardP[j + convert][i] = "*"
+                                    print("\nYour Frigate has been sunk!")
+                                else:
+                                    for convert in range(0, 3):
+                                        boardBotDisplay[j + convert][i] = "*"
+                                    print("\nEnemy Frigate sunk!")
+                                return True
+
+    elif ship == 1:
+        scanCount = 1
+
+        # Scan for # horizontally:
+
+        for i in range(1, 12):
+            if scanCount == 2:
+                break
+            else:
+                for j in range(1, 11):
+                    if scanCount == 2:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 2):
+                                if boardP[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 2):
+                                if boardBotDisplay[i][j + scan] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+
+        # If the code makes it here, set board pieces for the ship to '*'
+        # Has to check hidden board to ensure all the '!'s are of the same ship type
+
+        if scanCount == 2:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 2:
+                    break
+                else:
+                    for j in range(1, 11):
+                        if scanCount == 2:
+                            break
+                        else:
+                            for convert in range(0, 2):
+                                if user == 2:
+                                    if boardPCopy[i][j + convert] == "G":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[i + 4][j + 4 + convert] == "G":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 2:
+                                if user == 2:
+                                    for convert in range(0, 2):
+                                        boardP[i][j + convert] = "*"
+                                    print("\nYour Gunboat has been sunk!")
+                                else:
+                                    for convert in range(0, 2):
+                                        boardBotDisplay[i][j + convert] = "*"
+                                    print("\nEnemy Gunboat sunk!")
+                                return True
+
+        # Scan for # vertically:
+
+        scanCount = 1
+        for i in range(1, 12):
+            if scanCount == 2:
+                break
+            else:
+                for j in range(1, 11):
+                    if scanCount == 2:
+                        break
+                    else:
+                        if user == 2:
+                            for scan in range(0, 2):
+                                if boardP[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+                        else:
+                            for scan in range(0, 2):
+                                if boardBotDisplay[j + scan][i] == "#":
+                                    scanCount += scan
+                                else:
+                                    scanCount = 1
+                                    break
+        if scanCount == 2:
+            scanCount = 1
+            for i in range(1, 12):
+                if scanCount == 2:
+                    break
+                else:
+                    for j in range(1, 11):
+                        if scanCount == 2:
+                            break
+                        else:
+                            for convert in range(0, 2):
+                                if user == 2:
+                                    if boardPCopy[j + convert][i] == "G":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                                else:
+                                    if boardBot[j + 4 + convert][i + 4] == "G":
+                                        scanCount += convert
+                                    else:
+                                        scanCount = 1
+                                        break
+                            if scanCount == 2:
+                                if user == 2:
+                                    for convert in range(0, 2):
+                                        boardP[j + convert][i] = "*"
+                                    print("\nYour Gunboat has been sunk!")
+                                else:
+                                    for convert in range(0, 2):
+                                        boardBotDisplay[j + convert][i] = "*"
+                                    print("\nEnemy Gunboat sunk!")
+                                return True
