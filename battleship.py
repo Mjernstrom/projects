@@ -1,6 +1,7 @@
 import random
 from random import randint
 import copy
+from os import system, name
 
 # Author: Matthew Jernstrom
 # Written in January of 2020
@@ -16,21 +17,24 @@ import copy
 # Placement: converts string input to coordinates and performs placement
 # printBoards: I used a big space string to display both boards side by side
 # botPlacement: uses random generation and a massive amount of checks to create a valid board. Delete comment on
-        # the function call in the main loop to check it out in action
+# the function call in the main loop to check it out in action
 # turn: handles both player and bot turn. Checks game counters for game condition
-# convertToSunk: checks ship counters to display a sunken ship
 # botIntelligence: keeps track of multiple coordinates and attacks sort of like a human
 
+# Create board arrays
 
-
-# Array declarations
-
-boardP = [["." for i in range(12)] for j in range(12)]
-for i in range(0, 12):
-    if i == 0:
-        boardP[0][i] = "  "
-    else:
-        boardP[i][0] = str(chr(i + 64))
+boardP = [["." for i in range(13)] for j in range(13)]
+boardP[0][0] = " "
+for i in range(0, 13):
+    if i > 0:
+        boardP[0][i] = i
+        if i < 12:
+            boardP[i][0] = str(chr(i + 64))
+        else:
+            for j in range(0, 13):
+                boardP[i][j] = " "
+                boardP[j][i] = " "
+boardPcopy = copy.deepcopy(boardP)
 
 boardBot = [["." for i in range(20)] for j in range(20)]
 boardInt = 1
@@ -51,7 +55,6 @@ for i in range(0, 20):
             if j < 5 or j > 15:
                 boardBot[i][j] = "#"
 
-
 # Create AI choice index's
 
 # If in hit mode, choose to attack in 1 of 4 directions
@@ -61,9 +64,10 @@ for i in range(0, 20):
 # If this list manages to have all it's contents deleted, reset bot back to random selection
 
 directionChoice = [1, 2, 3, 4]
+direction = 0
 
 # This list is created to store the original spot of the hit in order to ensure the bot can
-# return to it to keep searching for the rest of the ship's peices
+# return to it to keep searching for the rest of the ship's pieces
 # The second pair of coordinates in the list is there to ensure the bot keeps hitting in the same direction
 
 attackMode = 0
@@ -83,6 +87,15 @@ gbPl = 0
 botSunk = 0
 plSunk = 0
 
+
+# Function to clear window
+
+def clear():
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
+
 # Create and set the bot display board to have '?' spots
 
 boardBotDisplay = copy.deepcopy(boardP)
@@ -91,7 +104,7 @@ for i in range(1, 12):
     for j in range(1, 12):
         boardBotDisplay[i][j] = "?"
 
-# Print player and bot board
+# Print player and bot board side by side
 
 def printBoards():
     for i in range(0, 12):
@@ -119,6 +132,7 @@ def printBotHidden():
                 print("\n")
             print(boardBot[i][j], end="     ")
 
+
 # Intro to game and instructions
 
 def gameIntro():
@@ -128,72 +142,10 @@ def gameIntro():
           "\n        If you destroy an opponents ship, the '#' marks each turn into a '*'",
           "\n        Below your 4 ships are listed: a Battleship, a Cruiser, a Frigate, and a GunBoat -->",
           "\n\n     B  C  F  G\n     B  C  F  G\n     B  C  F\n     B  C\n     B",
-          "\n\n     Enter each space for your ships by typing in the corresponding spot such as 'A5'",
-          "\n\n     DO NOT MISS PLACE SHIP PIECES! If you do so, restart program!",
+          "\n\n     Enter each space for your ships by typing in the corresponding spot exactly like so: 'A1d'",
+          "\n       Where A1 is the initial spot placement and d means down. Use r for right, l for left, and u for up",
           "\n\n     Your board is displayed on the left, the bot's board is displayed to the right:")
 
-# Initialize placement of Player ships
-
-def placementInit(inputstring, shippiece):
-    stringIn = inputstring
-    length = len(inputstring)
-
-    # If player inputs column 10 or 11, we want access to 3 string elements:
-
-    if length == 3:
-        numberIn = int(inputstring[2])
-        if numberIn == 0:
-            check = placement(stringIn, 10, shippiece)
-            if check:
-                return True
-            else:
-                return False
-        elif numberIn == 1:
-            check = placement(stringIn, 11, shippiece)
-            if check:
-                return True
-            else:
-                return False
-
-    # If spot is in column 1-9:
-
-    elif length == 2:
-        numberIn = int(inputstring[1])
-        check = placement(stringIn, numberIn, shippiece)
-        if check:
-            return True
-        else:
-            return False
-    else:
-        print('Invalid input length provided!')
-        return False
-
-
-# Handle placement of Player ships
-
-def placement(stringinput, numberinput, shippiece):
-    numberIn = numberinput
-
-    # Convert string to character, and then use corresponding ord() value to compare
-    charToInt = ord(stringinput[0])
-
-    # For capital letters:
-
-    if charToInt < 97:
-        if boardP[charToInt - 64][numberIn] == ".":
-            boardP[charToInt - 64][numberIn] = shippiece
-        else:
-            return False
-
-    # For lowercase letters:
-
-    else:
-        if boardP[charToInt - 96][numberIn] == ".":
-            boardP[charToInt - 96][numberIn] = shippiece
-        else:
-            return False
-
-    return True
 
 # Handles placement of AI ship spots
 
@@ -516,65 +468,157 @@ def botPlacement():
                                 continueCheck = False
                                 x += 1
 
+# Initialize placement of Player ships
+
+def placementInit(inputstring, shippiece):
+    stringIn = inputstring
+    length = len(inputstring)
+
+    # If player inputs column 10 or 11, we want access to 3 string elements:
+
+    if length == 4:
+        numberIn = int(inputstring[2])
+        directionInput = inputstring[3].upper()
+        if numberIn == 0:
+            check = placement(stringIn, 10, shippiece, directionInput)
+            if check:
+                return True
+            else:
+                return False
+        elif numberIn == 1:
+            check = placement(stringIn, 11, shippiece, directionInput)
+            if check:
+                return True
+            else:
+                return False
+
+    # If spot is in column 1-9:
+
+    elif length == 3:
+        directionInput = inputstring[2].upper()
+        numberIn = int(inputstring[1])
+        check = placement(stringIn, numberIn, shippiece, directionInput)
+        if check:
+            return True
+        else:
+            return False
+    else:
+        print('Invalid input length provided!')
+        return False
+
+
+# Handle placement of Player ships
+
+def placement(stringinput, numberinput, shippiece, directioninput):
+    # Convert string to row:
+    charToInt = ord(stringinput[0])
+    placeCount = 0
+
+    # Set range for spot checks
+    if shippiece == "B":
+        placeCount = 5
+    elif shippiece == "C":
+        placeCount = 4
+    elif shippiece == "F":
+        placeCount = 3
+    elif shippiece == "G":
+        placeCount = 2
+
+    if directioninput == "D":
+        for x in range(0, placeCount):
+            if boardP[charToInt - 64 + x][numberinput] != ".":
+                return False
+        for x in range(0, placeCount):
+            boardP[charToInt - 64 + x][numberinput] = shippiece
+        return True
+    elif directioninput == "U":
+        for x in range(0, placeCount):
+            if boardP[charToInt - 64 - x][numberinput] != ".":
+                return False
+        for x in range(0, placeCount):
+            boardP[charToInt - 64 - x][numberinput] = shippiece
+        return True
+    elif directioninput == "L":
+        for x in range(0, placeCount):
+            if boardP[charToInt - 64][numberinput - x] != ".":
+                return False
+        for x in range(0, placeCount):
+            boardP[charToInt - 64][numberinput - x] = shippiece
+        return True
+    elif directioninput == "R":
+        for x in range(0, placeCount):
+            if boardP[charToInt - 64][numberinput + x] != ".":
+                return False
+        for x in range(0, placeCount):
+            boardP[charToInt - 64][numberinput + x] = shippiece
+        return True
+    else:
+        return False
+
 
 # Handles input for player ship spots
 
 def createBoard():
-    j = 1
+    global boardPcopy
+    j = 0
     battleshipPiece = "B"
     cruiserPiece = "C"
     frigatePiece = "F"
     gunboatPiece = "G"
-    while j < 6:
+    while j == 0:
         printBoards()
-        inputstring = input("\n\nEnter spot " + str(j) + " for your Battleship -->")
+        inputstring = input("\n\nEnter initial spot followed by direction for your Battleship -->")
         print(inputstring)
-        checkSpot = placementInit(inputstring, battleshipPiece)
+        checkSpot = placementInit(inputstring.upper(), battleshipPiece)
         if checkSpot:
             j += 1
         else:
             print(inputstring, " is not a valid spot! Choose again -->")
-    j = 1
-    while j < 5:
+    j = 0
+    while j == 0:
         printBoards()
-        inputstring = input("\n\nEnter spot " + str(j) + " for your Cruiser -->")
+        inputstring = input("\n\nEnter spot initial spot followed by direction for your Cruiser -->")
         print(inputstring)
-        checkSpot = placementInit(inputstring, cruiserPiece)
+        checkSpot = placementInit(inputstring.upper(), cruiserPiece)
         if checkSpot:
             j += 1
         else:
             print(inputstring, " is not a valid spot! Choose again -->")
-    j = 1
-    while j < 4:
+    j = 0
+    while j == 0:
         printBoards()
-        inputstring = input("\n\nEnter spot " + str(j) + " for your Frigate -->")
+        inputstring = input("\n\nEnter spot initial spot followed by direction for your Frigate -->")
         print(inputstring)
-        checkSpot = placementInit(inputstring, frigatePiece)
+        checkSpot = placementInit(inputstring.upper(), frigatePiece)
         if checkSpot:
             j += 1
         else:
             print(inputstring, " is not a valid spot! Choose again -->")
-    j = 1
-    while j < 3:
+    j = 0
+    while j == 0:
         printBoards()
-        inputstring = input("\n\nEnter spot " + str(j) + " for your GunBoat -->")
+        inputstring = input("\n\nEnter spot initial spot followed by direction for your GunBoat -->")
         print(inputstring)
-        checkSpot = placementInit(inputstring, gunboatPiece)
+        checkSpot = placementInit(inputstring.upper(), gunboatPiece)
         if checkSpot:
             j += 1
         else:
             print(inputstring, " is not a valid spot! Choose again -->")
+    boardPcopy = copy.deepcopy(boardP)
+
 
 # Handle's turns
-# Returns 0 if player or bot choice is invalid
+# Returns 0 if player choice is invalid or bot misses
 # Returns 1 if player wins
 # Returns 2 if bot wins
 # Return True if game continues
 
-def turn(spot, user, attackmode):
-
+def turn(spot, user, directionchoice):
     # Allow function to modify game counters
-
+    global direction
+    global directionChoice
+    global tracking
+    global attackMode
     global bShipBot
     global frigBot
     global cruBot
@@ -586,6 +630,14 @@ def turn(spot, user, attackmode):
     global botSunk
     global plSunk
     length = len(spot)
+
+    if length < 2:
+        if user == 1:
+            print("\nInvalid input, choose again:")
+            return 0
+        else:
+            return 0
+
     numberIn = int(spot[1])
 
     # Convert the first part of the string to it's corresponding row number
@@ -599,7 +651,15 @@ def turn(spot, user, attackmode):
     # Check col number and make comparisons
 
     if length == 3:
+
         numberIn = int(spot[2])
+
+        if numberIn > 1:
+            if user == 1:
+                print("\nInvalid input, choose again:")
+                return 0
+            else:
+                return 0
 
         # Checks if hit or miss for the 10th column on player or bot's turn, increments hit counter if hit
 
@@ -622,9 +682,28 @@ def turn(spot, user, attackmode):
                 else:
                     print("\nMISS!")
             elif user == 2:
-                if boardP[row][10] == "#" or boardP[row][10] == "*":
-                    return 0
-                if boardP[row][10] != ".":
+                if boardP[row][10] == "#" or boardP[row][10] == "*" or boardP[row][10] == ".":
+                    if attackMode == 2:
+                        for i in range(2, 4):
+                            tracking[i] = 0
+                            attackMode = 1
+                        for deleteDirection in range(0, 4):
+                            if direction == directionChoice[deleteDirection]:
+                                directionChoice[deleteDirection] = 0
+                        print("\nBot MISSED!")
+                    elif attackMode == 1:
+                        if directionchoice == 1:
+                            directionChoice[0] = 0
+                        elif directionchoice == 2:
+                            directionChoice[1] = 0
+                        elif directionchoice == 3:
+                            directionChoice[2] = 0
+                        elif directionchoice == 4:
+                            directionChoice[3] = 0
+                        print("\nBot MISSED!")
+                    else:
+                        print("\nBot MISSED!")
+                else:
                     if boardP[row][10] == "B":
                         bShipPl += 1
                     elif boardP[row][10] == "C":
@@ -635,18 +714,17 @@ def turn(spot, user, attackmode):
                         gbPl += 1
                     boardP[row][10] = "#"
                     print("\nYou have been hit!")
-                    if attackmode == 1:
+                    if attackMode == 0:
                         tracking[0] = row
                         tracking[1] = 10
-                    elif attackmode == 2:
+                        attackMode = 1
+                    elif attackMode == 1:
                         tracking[2] = row
                         tracking[3] = 10
-                    return [row, 10]
-                else:
-                    if attackMode == 2:
-                        for i in range(0, 4):
-                            tracking[i] = 0
-                    print("\nBot MISSED!")
+                        attackMode = 2
+                    elif attackMode == 2:
+                        tracking[2] = row
+                        tracking[3] = 10
 
         # Checks if hit or miss for the 11th column on player or bot's turn, increments hit counter if hit
 
@@ -669,9 +747,28 @@ def turn(spot, user, attackmode):
                 else:
                     print("\nMISS!")
             elif user == 2:
-                if boardP[row][11] == "#" or boardP[row][11] == "*":
-                    return 0
-                if boardP[row][11] != ".":
+                if boardP[row][11] == "#" or boardP[row][11] == "*" or boardP[row][11] == ".":
+                    if attackMode == 2:
+                        for i in range(2, 4):
+                            tracking[i] = 0
+                            attackMode = 1
+                        for deleteDirection in range(0, 4):
+                            if direction == directionChoice[deleteDirection]:
+                                directionChoice[deleteDirection] = 0
+                        print("\nBot MISSED!")
+                    elif attackMode == 1:
+                        if directionchoice == 1:
+                            directionChoice[0] = 0
+                        elif directionchoice == 2:
+                            directionChoice[1] = 0
+                        elif directionchoice == 3:
+                            directionChoice[2] = 0
+                        elif directionchoice == 4:
+                            directionChoice[3] = 0
+                        print("\nBot MISSED!")
+                    else:
+                        print("\nBot MISSED!")
+                else:
                     if boardP[row][11] == "B":
                         bShipPl += 1
                     elif boardP[row][11] == "C":
@@ -682,15 +779,17 @@ def turn(spot, user, attackmode):
                         gbPl += 1
                     boardP[row][11] = "#"
                     print("\nYou have been hit!")
-                    if attackmode == 1:
+                    if attackMode == 0:
                         tracking[0] = row
                         tracking[1] = 11
-                    elif attackmode == 2:
+                        attackMode = 1
+                    elif attackMode == 1:
                         tracking[2] = row
                         tracking[3] = 11
-                    return [row, 11]
-                else:
-                    print("\nBot MISSED!")
+                        attackMode = 2
+                    elif attackMode == 2:
+                        tracking[2] = row
+                        tracking[3] = 11
 
     # Checks if hit or miss for any column less than 10 on player or bot's turn, increments hit counter if hit
 
@@ -713,9 +812,25 @@ def turn(spot, user, attackmode):
             else:
                 print("\nMISS!")
         elif user == 2:
-            if boardP[row][numberIn] == "#" or boardP[row][numberIn] == "*":
-                return 0
-            if boardP[row][numberIn] != ".":
+            if boardP[row][numberIn] == "#" or boardP[row][numberIn] == "*" or boardP[row][numberIn] == ".":
+                if attackMode == 2:
+                    for i in range(2, 4):
+                        tracking[i] = 0
+                        attackMode = 1
+                    print("\nBot MISSED!")
+                elif attackMode == 1:
+                    if directionchoice == 1:
+                        directionChoice[0] = 0
+                    elif directionchoice == 2:
+                        directionChoice[1] = 0
+                    elif directionchoice == 3:
+                        directionChoice[2] = 0
+                    elif directionchoice == 4:
+                        directionChoice[3] = 0
+                    print("\nBot MISSED!")
+                else:
+                    print("\nBot MISSED!")
+            else:
                 if boardP[row][numberIn] == "B":
                     bShipPl += 1
                 elif boardP[row][numberIn] == "C":
@@ -726,499 +841,262 @@ def turn(spot, user, attackmode):
                     gbPl += 1
                 boardP[row][numberIn] = "#"
                 print("\nYou have been hit!")
-                if attackmode == 1:
+                if attackMode == 0:
                     tracking[0] = row
                     tracking[1] = numberIn
-                elif attackmode == 2:
+                    attackMode = 1
+                elif attackMode == 1:
                     tracking[2] = row
                     tracking[3] = numberIn
-                return [row, numberIn]
-            else:
-                print("\nBot MISSED!")
+                    attackMode = 2
+                elif attackMode == 2:
+                    tracking[2] = row
+                    tracking[3] = numberIn
     else:
-        print("\nInvalid input, choose again:")
-        return 0
+        if user == 1:
+            print("\nInvalid input, choose again:")
+            return 0
+        else:
+            return 0
 
-   # Check if ship is sunk and increment final game counter accordingly
+    # Check if ship is sunk and increment final game counter accordingly
+    # Once bot sinks players ship, resets AI parameters
 
     if bShipBot == 5:
-        convertToSunk(4, 1)
-        botSunk += 1
+        print("\nEnemy Battleship sunk!")
+        botSunk +=1
         bShipBot = 0
     if cruBot == 4:
-        convertToSunk(3, 1)
+        print("\nEnemy Cruiser sunk!")
         botSunk += 1
         cruBot = 0
     if frigBot == 3:
-        convertToSunk(2, 1)
+        print("\nEnemy Frigate sunk!")
         botSunk += 1
         frigBot = 0
     if gbBot == 2:
-        convertToSunk(1, 1)
+        print("\nEnemy Gunboat sunk!")
         botSunk += 1
         gbBot = 0
     if bShipPl == 5:
-        convertToSunk(4, 2)
+        print("\nYour Battleship has been sunk!")
+        attackMode = 0
+        direction = 0
+        for reset in range(0, 4):
+            tracking[reset] = 0
+            directionChoice[reset] = reset + 1
         plSunk += 1
         bShipPl = 0
     if cruPl == 4:
-        convertToSunk(3, 2)
+        print("\nYour Cruiser has been sunk!")
+        attackMode = 0
+        direction = 0
+        for reset in range(0, 4):
+            tracking[reset] = 0
+            directionChoice[reset] = reset + 1
         plSunk += 1
         cruPl = 0
     if frigPl == 3:
-        convertToSunk(2, 2)
+        print("\nYour Frigate has been sunk!")
+        attackMode = 0
+        direction = 0
+        for reset in range(0, 4):
+            tracking[reset] = 0
+            directionChoice[reset] = reset + 1
         plSunk += 1
         frigPl = 0
     if gbPl == 2:
-        convertToSunk(1, 2)
+        print("\nYour Gunboat has been sunk!")
+        attackMode = 0
+        direction = 0
+        for reset in range(0, 4):
+            tracking[reset] = 0
+            directionChoice[reset] = reset + 1
         plSunk += 1
         gbPl = 0
 
     # Check win/loss condition
 
     if botSunk == 4:
-        return 1
+        return 3
     if plSunk == 4:
-        return 2
+        return 4
 
-# Scans board bot's display board for #'s and compares location to hidden board's letter in the scanned positions
-# If it detects a certain amount of #'s, it will convert each display board spot from # to *
-# Only shows bot's sunk ships
-
-def convertToSunk(ship, user):
-
-    displayCheck = True
-
-    # Scan bot's board for a sunk ship:
-
-    if user == 1:
-        if ship == 4:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 5):
-                        if boardBotDisplay[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 5):
-                            if botBoard[i + 4][j + 4 + convert] != "B":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 5):
-                                boardBotDisplay[i][j + convert] = "*"
-                            print("\nEnemy Battleship sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 5):
-                        if boardBotDisplay[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 5):
-                            if botBoard[i + 4 + convert][j + 4] != "B":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 5):
-                                boardBotDisplay[i + convert][j] = "*"
-                            print("\nEnemy Battleship sunk!")
-                            return True
-
-        elif ship == 3:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 4):
-                        if boardBotDisplay[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 4):
-                            if botBoard[i + 4][j + 4 + convert] != "C":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 4):
-                                boardBotDisplay[i][j + convert] = "*"
-                            print("\nEnemy Cruiser sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 4):
-                        if boardBotDisplay[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 4):
-                            if botBoard[i + 4 + convert][j + 4] != "C":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 4):
-                                boardBotDisplay[i + convert][j] = "*"
-                            print("\nEnemy Cruiser sunk!")
-                            return True
-
-        elif ship == 2:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 3):
-                        if boardBotDisplay[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 3):
-                            if botBoard[i + 4][j + 4 + convert] != "F":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 3):
-                                boardBotDisplay[i][j + convert] = "*"
-                            print("\nEnemy Frigate sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 3):
-                        if boardBotDisplay[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 3):
-                            if botBoard[i + 4 + convert][j + 4] != "F":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 3):
-                                boardBotDisplay[i + convert][j] = "*"
-                            print("\nEnemy Frigate sunk!")
-                            return True
-
-        elif ship == 1:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 2):
-                        if boardBotDisplay[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 2):
-                            if botBoard[i + 4][j + 4 + convert] != "G":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 2):
-                                boardBotDisplay[i][j + convert] = "*"
-                            print("\nEnemy Gunboat sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 2):
-                        if boardBotDisplay[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 2):
-                            if botBoard[i + 4 + convert][j + 4] != "G":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 2):
-                                boardBotDisplay[i + convert][j] = "*"
-                            print("\nEnemy Gunboat sunk!")
-                            return True
-    elif user == 2:
-        if ship == 4:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 5):
-                        if boardP[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 5):
-                            if boardPCopy[i][j + convert] != "B":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 5):
-                                boardP[i][j + convert] = "*"
-                            print("\nYour Battleship has been sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 5):
-                        if boardP[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 5):
-                            if boardPCopy[i + convert][j] != "B":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 5):
-                                boardP[i + convert][j] = "*"
-                            print("\nYour Battleship has been sunk!")
-                            return True
-
-        elif ship == 3:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 4):
-                        if boardP[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 4):
-                            if boardPCopy[i][j + convert] != "C":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 4):
-                                boardP[i][j + convert] = "*"
-                            print("\nYour Cruiser has been sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 4):
-                        if boardP[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 4):
-                            if boardPCopy[i + convert][j] != "C":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 4):
-                                boardP[i + convert][j] = "*"
-                            print("\nYour Cruiser has been sunk!")
-                            return True
-
-        elif ship == 2:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 3):
-                        if boardP[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 3):
-                            if boardPCopy[i][j + convert] != "F":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 3):
-                                boardP[i][j + convert] = "*"
-                            print("\nYour Frigate has been sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 3):
-                        if boardP[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 3):
-                            if boardPCopy[i + convert][j] != "F":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 3):
-                                boardP[i + convert][j] = "*"
-                            print("\nYour Frigate has been sunk!")
-                            return True
-
-        elif ship == 1:
-
-            # Scan for # horizontally:
-
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 2):
-                        if boardP[i][j + scan] != "#":
-                            displayCheck = False
-
-                    # If the code makes it here, set board pieces for the ship to '*'
-                    # Has to check hidden board to ensure all the '!'s are of the same ship type
-
-                    if displayCheck:
-                        for convert in range(0, 2):
-                            if boardPCopy[i][j + convert] != "G":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 2):
-                                boardP[i][j + convert] = "*"
-                            print("\nYour Gunboat has been sunk!")
-                            return True
-
-            # Scan for # vertically:
-
-            displayCheck = True
-            for i in range(1, 12):
-                for j in range(1, 7):
-                    for scan in range(0, 2):
-                        if boardP[j + scan][i] != "#":
-                            displayCheck = False
-                    if displayCheck:
-                        for convert in range(0, 2):
-                            if boardPCopy[i + convert][j] != "G":
-                                displayCheck = False
-                        if displayCheck:
-                            for convert in range(0, 2):
-                                boardP[i + convert][j] = "*"
-                            print("\nYour Gunboat has been sunk!")
-                            return True
+    return True
 
 # Handle each bot turn, threw some AI in here
 # if 0 is passed in, perform random attack
 # If 1, enable hit mode
 # if 2, perform track mode
 
-def botIntelligence(attacktype):
+def botIntelligence():
+    global attackMode
+    attackType = attackMode
     global directionChoice
+    global direction
+    import random
     spotList = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"]
+    returnVal = 0
 
     # Generate random attack
 
-    if not attacktype:
-        random = True
-        if random:
-            randRow = spotList[randint(0, 10)]
-            randCol = str(randint(1, 12))
-            randomAttack = randRow + randCol
-            returnVal = turn(randomAttack, 2)
-            if returnVal =
+
 
     # Generate intelligent attack
     # Hit mode enables and can be re-enabled if bot needs to return to original hit position
     # Track mode is when the bot hits multiple spots in a row, so the bot keeps hitting in the specified direction
 
-    elif attacktype == 1:
-        randAttack = random.choice(directionChoice)
+    if attackType == 1:
+        choices = False
+        randAttack = 0
 
+        # Check if direction choices list is exhausted:
 
-    else:
+        for checkChoices in range(0, 4):
+            if directionChoice[checkChoices] != 0:
+                choices = True
+        if choices:
+            direction = 0
+            randomDir = False
+            while not randomDir:
+                randAttack = random.choice(directionChoice)
+                if randAttack > 0:
+                    direction = randAttack
+                    randomDir = True
+        else:
+            tracking[0] = 0
+            tracking[1] = 0
+            direction = 0
+            attackMode = 0
+            attackType = 0
 
+        # Attack up 1 row
+        if randAttack == 1:
+            rowAttackInt = tracking[0] - 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(tracking[1])
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 1)
+        # Attack down 1 row
+        elif randAttack == 2:
+            rowAttackInt = tracking[0] + 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(tracking[1])
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 2)
+        # Attack right 1 column
+        elif randAttack == 3:
+            rowAttackInt = tracking[0]
+            colAttackInt = tracking[1] + 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(colAttackInt)
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 3)
+        # Attack left 1 column
+        elif randAttack == 4:
+            rowAttackInt = tracking[0]
+            colAttackInt = tracking[1] - 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(colAttackInt)
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 4)
+
+    # Generate random attack
+
+    if attackType == 0:
+        randRow = spotList[randint(0, 10)]
+        randCol = str(randint(1, 12))
+        randomAttack = randRow + randCol
+        turn(randomAttack, 2, None)
+
+    # From the tracking list [x, y, x, y] the bot uses the global variable 'direction' to guide it's turns
+
+    elif attackType == 2:
+        # Attack up 1 row
+        if direction == 1:
+            rowAttackInt = tracking[2] - 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(tracking[3])
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 1)
+        # Attack down 1 row
+        elif direction == 2:
+            rowAttackInt = tracking[2] + 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(tracking[3])
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 2)
+        # Attack right 1 column
+        elif direction == 3:
+            rowAttackInt = tracking[2]
+            colAttackInt = tracking[3] + 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(colAttackInt)
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 3)
+        # Attack left 1 column
+        elif direction == 4:
+            rowAttackInt = tracking[2]
+            colAttackInt = tracking[3] - 1
+            rowAttack = spotList[rowAttackInt - 1]
+            colAttack = str(colAttackInt)
+            spot = rowAttack + colAttack
+            returnVal = turn(spot, 2, 4)
+
+    # Return game condition value from turn
+
+    if returnVal == 1:
+        return 1
+    elif returnVal == 2:
+        return 2
 
 
 # Master function
-
 
 def main():
     # gameIntro()
     createBoard()
     # A copy of the player board is made to scan for sunk player ships
-    boardPCopy = copy.deepcopy(boardP)
     printBoards()
     botPlacement()
-
-   # Game loop
-
+    #printBotHidden()  <-- Un-comment this to see the bot random board generation in action
+    # Game loop
     gameLoop = True
     while gameLoop:
 
         # Handle player turn
-
-        validPlayer = True
-        while validPlayer:
+        turnPlayer = False
+        turnBot = True
+        while not turnPlayer:
             printBoards()
             playerSpot = input("\nEnter spot to attack:")
-            turn(playerSpot, 1)
-            if turn == 1:
+            turnPlayer = turn(playerSpot, 1, None)
+            if turnPlayer == 3:
                 print("You have won!")
                 printBoards()
                 gameLoop = False
+                turnBot = False
                 break
-            elif turn == 2:
+            elif turnPlayer == 4:
                 print("You have lost!")
                 printBoards()
                 gameLoop = False
+                turnBot = False
                 break
-            elif turn == 0:
-                validPlayer = True
-            elif turn:
-                validPlayer = False
+            elif turnPlayer:
+                break
 
         # Handle bot turn
-        
-        validBot = True
-        while validBot:
+        if turnBot:
             print("\nBot is attacking. . . ")
-            printBoards()
-
-            # Implement bot spot selection
-
-            if attackMode == 2:
-
-            elif attackMode == 1:
-
-            botIntelligence(attackMode)
-            if turn == 1:
-                 print("You have won!")
-                 printBoards()
-                 gameLoop = False
-                 break
-            elif turn == 2:
-                 print("You have lost!")
-                 printBoards()
-                 gameLoop = False
-                 break
-            elif turn == 0:
-                 validBot = True
-            elif turn:
-                 validBot = False
-
-
+            returnVal = botIntelligence()
+            if returnVal == 3:
+                print("You have won!")
+                printBoards()
+                gameLoop = False
+            elif returnVal == 4:
+                print("You have lost!")
+                printBoards()
+                gameLoop = False
 
 main()
