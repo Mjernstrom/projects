@@ -1054,7 +1054,7 @@ def botIntelligence():
 # Master function
 
 def main():
-    # gameIntro()
+    gameIntro()
     createBoard()
     # A copy of the player board is made to scan for sunk player ships
     printBoards()
