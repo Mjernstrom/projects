@@ -1,0 +1,7 @@
+This was my web development class final project. The goal was to create a functioning order page that 
+transfers order details to the shopping cart page.
+For this project I only did the following:
+1. Wrote all the JavaScript in co_cart.js and linked it to co_cart.html
+2. In co_credit.js, I wrote all the js up until where it says "Functions already provided in the file"
+3. Linked co_credit.js to co_credit.html
+4. Added some custom css to the base layout css file
