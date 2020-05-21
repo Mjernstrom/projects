@@ -1,0 +1,3 @@
+This project uses a class to read flat data from a sqllite database and creates some new columns from the data.
+The class concatenates the first and last name to a full name column, uses the datatime library to return the age using the relative delta property and returns if the person is an adult.
+It then exports the resulting dictionary to a json file.
