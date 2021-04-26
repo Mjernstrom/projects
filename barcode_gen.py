@@ -1,4 +1,4 @@
-mport kivy
+import kivy
 import os
 import pandas as pd
 from kivy.app import App
